@@ -7,12 +7,14 @@
 int init(void){
 	DDRC=0xff;
 	PORTC=(1<<PC5); // USING PC5 for just blinking. will use PC4 for tx signal.
+	return 0;
 }
 
 int sendseq(void){
 	PORTC|=(1<<PC4);
 	_delay_ms(1000);
 	PORTC&=~(1<<PC4);
+	return 0;
 }
 
 int main(void){
