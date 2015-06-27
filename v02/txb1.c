@@ -11,9 +11,10 @@ int init(void){
 }
 
 int sendseq(void){
-	PORTC|=(1<<PC4);
+	PORTC|=(1<<PC4)|(1<<PC5);
+	_delay_ms(5000);
+	PORTC&=~((1<<PC4)|(1<<PC5));
 	_delay_ms(1000);
-	PORTC&=~(1<<PC4);
 	return 0;
 }
 
@@ -21,8 +22,6 @@ int main(void){
 	init();
 	while(1){
 		sendseq();
-		PORTC^=(1<<PC5);
-		_delay_ms(1000);
 		}
 }
 	

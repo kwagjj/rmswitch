@@ -1,5 +1,5 @@
-FILE=rx1.c
-DEVPATH=/dev/bus/usb/001/013
+FILE=txb2.c
+DEVPATH=/dev/bus/usb/001/007
 
 step1:
 	avr-gcc -mmcu=atmega328p -Wall -Os -o main.elf $(FILE)
