@@ -14,6 +14,9 @@ static int sampling_sum=0;
 static int returnbit=0;
 static int start_rx=0;
 static int cd_ib=0;
+static char input[3];	// will save three serial chars after start byte('a')
+static uint8_t input_count=0; // used for counting input[] insertions.
+static uint8_t enable_activate=1;
 
 
 int init(void){
@@ -84,6 +87,23 @@ int inputbuffer_check(void){
 	return 0;
 }
 
+void activate(void){
+	PORTC^=(1<<PC3);
+	enable_activate=0;
+}
+
+int evaluate(void){
+	int i;
+	for(i=0;i<3;i++){
+		if(!input[i]=='a'){
+			return 1;
+		}
+	}
+
+	activate();
+	return 0;
+}
+
 
 int main(void){
 	_delay_ms(1000);
@@ -95,9 +115,16 @@ int main(void){
 				}
 				else{
 					if(cd_ib==8){
-						tx_char(inputbuffer);
+
+						if(input_count>=3){
+							evaluate();
+							input_count=0;
+						}
+						input[input_count]=inputbuffer;
+						// tx_char(inputbuffer);
 						start_rx=0;
 						cd_ib=0;
+						inputbuffer++;
 					}
 				}
 				// check buffer once. 
