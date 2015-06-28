@@ -1,4 +1,5 @@
-FILE=rx_checkinput.c
+FILE=rx.c
+
 
 
 

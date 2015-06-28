@@ -5,7 +5,6 @@
 #include <avr/interrupt.h>
 #include "uart.h"
 
-#define PERIOD 50
 #define RFPORT PORTC
 #define RFPIN PC5
 #define BITPERIOD 9 // in ms unit
@@ -37,7 +36,7 @@ void send_off(void){
 	RFPORT&=~(1<<RFPIN);
 }
 
-ISR(TIMER0_COMPA_vect){
+ISR(TIMER0_COMPA_vect){ // approx 2ms period.
 	if(count%10==0){
 		if(data_send_bit>7){
 			data_send_bit=0;
@@ -51,36 +50,10 @@ ISR(TIMER0_COMPA_vect){
 		}
 
 		data_send_bit++;
+		count=0;
 	}
 	count++;
 }
-
-
-int sendchar(char data){
-	int i;
-	for(i=0;i<8;i++){
-		if(data&(1<<(7-i))){
-			send_on();
-		}
-		else{
-			send_off();
-		}
-
-		_delay_ms(BITPERIOD);
-
-	}
-	return 0;
-}
-
-int repeat(void){
-	PORTC=(1<<PC5)|(1<<PC4);
-	_delay_ms(PERIOD);
-	PORTC&=~((1<<PC5)|(1<<PC4));
-	_delay_ms(PERIOD);
-	
-	return 0;
-}
-
 
 int main(void){
 
