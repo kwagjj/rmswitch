@@ -11,6 +11,10 @@
 static int current_sample_num=0;
 static char inputbuffer=NULL;
 static int sampling_sum=0;
+static int returnbit=0;
+static int start_rx=0;
+static int cd_ib=0;
+
 
 int init(void){
 	DDRC=0xff;
@@ -30,7 +34,6 @@ int init(void){
 
 
 ISR(TIMER0_COMPA_vect){ // every 1ms approx.
-
 	if(current_sample_num>=SAMPLE_PER_BIT){
 		current_sample_num=0;
 		sampling_sum=0;
@@ -42,34 +45,66 @@ ISR(TIMER0_COMPA_vect){ // every 1ms approx.
 	}
 
 	if(current_sample_num==SAMPLE_PER_BIT-1){ // need to evaluate bit samples and insert correct bit value to inputbuffer
-
-		inputbuffer>>1;
 		if(sampling_sum>(SAMPLE_PER_BIT/2)){
-			inputbuffer|=0x80; // in binary: 0b1000 0000 so that msb is set to 1
-		} // if not bigger than sample_per_bit/2, then it will remain 0;
+			returnbit=1;
+		}
+		else{
+			returnbit=0;
+		}
+
 	}
 
 	current_sample_num++;
+	
+}
+
+int bitprocess(void){
+	if(returnbit>1){ // when bit has already been processed. return right away to avoid redundant processing.
+		return 1;
+	}
+	
+	inputbuffer=inputbuffer<<1;
+	inputbuffer|=returnbit;
+
+	returnbit=2; // make it not 0 or 1. any value higher than 1.
+	if(start_rx==1){
+		cd_ib++;
+	}
+
+	return 0; // return 0 when has processed a bit properly
 
 
 }
 
-
-
 int inputbuffer_check(void){
 	if(inputbuffer=='a'){
-		PORTC^=(1<<PC4);
-		_delay_ms(1000);
 		tx_char('a');
+		start_rx=1;
+}
+	return 0;
 }
 
 
 int main(void){
+	_delay_ms(1000);
 	init();
-	while(1){
-		
-		inputbuffer_check()	
+	while(1){	
+			if(!bitprocess()){
+				if(start_rx==0){
+					inputbuffer_check();
+				}
+				else{
+					if(cd_ib==8){
+						tx_char(inputbuffer);
+						start_rx=0;
+						cd_ib=0;
+					}
+				}
+				// check buffer once. 
+			}
 		}
+
+	return 0;
 
 }
 	

@@ -43,10 +43,18 @@ ISR(TIMER0_COMPA_vect){ // every 1ms approx.
 
 	if(current_sample_num==SAMPLE_PER_BIT-1){ // need to evaluate bit samples and insert correct bit value to inputbuffer
 
-		inputbuffer>>1;
+//		inputbuffer>>1;
+//		if(sampling_sum>(SAMPLE_PER_BIT/2)){
+//			inputbuffer|=0x80; // in binary: 0b1000 0000 so that msb is set to 1
+//		} // if not bigger than sample_per_bit/2, then it will remain 0;
+
 		if(sampling_sum>(SAMPLE_PER_BIT/2)){
-			inputbuffer|=0x80; // in binary: 0b1000 0000 so that msb is set to 1
-		} // if not bigger than sample_per_bit/2, then it will remain 0;
+			tx_char('1');
+		}
+		else{
+			tx_char('0');
+		}
+
 	}
 
 	current_sample_num++;
@@ -62,14 +70,16 @@ int inputbuffer_check(void){
 		_delay_ms(1000);
 		tx_char('a');
 }
+	return 0;
+}
 
 
 int main(void){
 	init();
-	while(1){
-		
-		inputbuffer_check()	
+	while(1){	
 		}
+
+	return 0;
 
 }
 	

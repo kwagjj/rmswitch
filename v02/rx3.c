@@ -11,6 +11,8 @@
 static int current_sample_num=0;
 static char inputbuffer=NULL;
 static int sampling_sum=0;
+static int returnbit=0;
+
 
 int init(void){
 	DDRC=0xff;
@@ -30,7 +32,6 @@ int init(void){
 
 
 ISR(TIMER0_COMPA_vect){ // every 1ms approx.
-
 	if(current_sample_num>=SAMPLE_PER_BIT){
 		current_sample_num=0;
 		sampling_sum=0;
@@ -43,13 +44,22 @@ ISR(TIMER0_COMPA_vect){ // every 1ms approx.
 
 	if(current_sample_num==SAMPLE_PER_BIT-1){ // need to evaluate bit samples and insert correct bit value to inputbuffer
 
-		inputbuffer>>1;
+		inputbuffer=inputbuffer<<1;
 		if(sampling_sum>(SAMPLE_PER_BIT/2)){
-			inputbuffer|=0x80; // in binary: 0b1000 0000 so that msb is set to 1
+			inputbuffer|=0x01; // in binary: 0b1000 0000 so that msb is set to 1
 		} // if not bigger than sample_per_bit/2, then it will remain 0;
+
+//		if(sampling_sum>(SAMPLE_PER_BIT/2)){
+//			tx_char('1');
+//		}
+//		else{
+//			tx_char('0');
+//		}
+//
 	}
 
 	current_sample_num++;
+
 
 
 }
@@ -58,18 +68,20 @@ ISR(TIMER0_COMPA_vect){ // every 1ms approx.
 
 int inputbuffer_check(void){
 	if(inputbuffer=='a'){
-		PORTC^=(1<<PC4);
-		_delay_ms(1000);
 		tx_char('a');
+		start_rx=1;
+}
+	return 0;
 }
 
 
 int main(void){
 	init();
-	while(1){
-		
-		inputbuffer_check()	
+	while(1){	
+		inputbuffer_check();
 		}
+
+	return 0;
 
 }
 	

@@ -1,5 +1,8 @@
-FILE=txb2.c
-DEVPATH=/dev/bus/usb/001/007
+FILE=rx_checkinput.c
+
+
+
+DEVPATH=/dev/bus/usb/001/008
 
 step1:
 	avr-gcc -mmcu=atmega328p -Wall -Os -o main.elf $(FILE)

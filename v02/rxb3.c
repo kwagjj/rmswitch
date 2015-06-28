@@ -17,8 +17,6 @@ int init(void){
 	PORTC=0;
 	DDRB=0; // USE B PINS FOR READING INPUT
 
-	uartinit(12);
-
 	TCCR0A=(1<<WGM01);
 	TCCR0B=(1<<CS01)|(1<<CS00);
 	TCNT0=0;
@@ -60,7 +58,6 @@ int inputbuffer_check(void){
 	if(inputbuffer=='a'){
 		PORTC^=(1<<PC4);
 		_delay_ms(1000);
-		tx_char('a');
 }
 
 
